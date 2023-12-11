@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: springcloud-config-client
+  cloud:
+    config: # https://github.com/ztg25/spring-cloud-config/tree/main/config-center/application-dev.properties
+      profile: dev
+      label: main
+      name: application
+      uri: http://localhost:3721/
+      username: tony
+      password: 123456

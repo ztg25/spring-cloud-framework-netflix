@@ -1,0 +1,81 @@
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:9091/eureka/
+server:
+  port: 8080
+#  tomcat:
+#    uri-encoding: UTF-8
+#    basedir: /tmp/tomcat
+#    connection-timeout: 120000ms
+#    max-connections: 0 # Maximum number of connections that the server accepts and processes at any given time.
+#    max-http-header-size: 0 # Maximum size, in bytes, of the HTTP message header.
+#    max-http-post-size: 0 # Maximum size, in bytes, of the HTTP post content.
+#    max-threads: 0 # Maximum number of worker threads.
+#    min-spare-threads: 0 # Minimum number of worker threads.
+spring:
+  application:
+    name: Gateway-Service
+  zipkin:
+    base-url: http://localhost:9411
+#        base-url: http://192.168.0.3:9411
+    sender:
+      type: web
+  sleuth:
+    sampler:
+      percentage: 1.0
+  redis:
+    host: localhost
+    port: 6379
+    database: 0
+    password:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+#          lower-case-service-id: true #将请求路径上的服务名配置为小写（因为服务注册的时候，向注册中心注册时将服务名转成大写的了,比如以/service-hi/*的请求路径被路由转发到服务名为service-hi的服务上
+          enabled: true
+      routes:
+      #路由的id，没有固定规则，建议配合服务名使用
+      - id: api-site-flightmanagement-flightservcie
+        #uri: http://localhost:11101
+        uri: lb://FLIGHT-SERVICE
+        predicates:
+          - Path=/v1/api/flightservice/**
+        filters:
+          - StripPrefix=3
+      - id: api-site-ordermanagement-orderservice
+        #uri: http://localhost:8101
+        uri: lb://ORDER-CREATE-SERVICE
+        predicates:
+          - Path=/v1/api/orderservice/**
+        filters:
+          - StripPrefix=3
+#          - name: RequestRateLimiter
+#            args:
+#              # 令牌桶每秒填充平均速率, 允许用户每秒处理多少个请求。
+#              redis-rate-limiter.replenishRate: 1
+#              # 令牌桶的容量，允许在1s内完成的最大请求数。
+#              redis-rate-limiter.burstCapacity: 1
+#              #请求IP地址限流
+#              key-resolver: '#{@hostAddrKeyResolver}'
+#              key-resolver: '#{@userKeyResolver}'#请求用户限流
+#              key-resolver: '#{@apiKeyResolver}'#请求api URL限流
+      - id: api-site-flightmanagement-flightticketservice
+        #uri: http://localhost:8101
+        uri: lb://FLIGHT-TICKET-SERVICE
+        predicates:
+          - Path=/v1/api/ticketservice/**
+        filters:
+          - StripPrefix=3
+#          - name: RequestRateLimiter
+#            args:
+#              # 令牌桶每秒填充平均速率, 允许用户每秒处理多少个请求。
+#              redis-rate-limiter.replenishRate: 1
+#              # 令牌桶的容量，允许在1s内完成的最大请求数。
+#              redis-rate-limiter.burstCapacity: 1
+#              #请求IP地址限流
+#              key-resolver: '#{@hostAddrKeyResolver}'
+logging:
+  level:
+    org.springframework:cloud.gateway: debug

@@ -1,0 +1,18 @@
+server:
+  port: 3721
+spring:
+  application:
+    name: springcloud-config-service
+  cloud:
+    config:
+      server:  # try to access by http://localhost:3721/application/main or http://localhost:3721/application/dev/main
+        git:
+          uri: https://github.com/ztg25/spring-cloud-config.git
+          search-paths: config-center
+          username: ztg25@126.com
+          password: ztg973025
+          force-pull: true
+  security:  # 设置网站http://localhost:3721/访问时输入用户密码，spring-boot-starter-security
+    user:
+      name: tony
+      password: 123456
